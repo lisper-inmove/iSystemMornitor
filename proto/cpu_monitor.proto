@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package monitor.cpu;
+
+message CPUTimes {
+  message CPUTime {
+    // 系统时间
+    int64 timestamp = 1;
+    // 用户空间执行耗时(秒)
+    float user_mode_time = 2;
+    // 系统任务执行耗时(秒)
+    float kernel_mode_time = 3;
+    // 系统空闲时间(秒)
+    float idle_time = 4;
+    int32 cpu_index = 5;
+  }
+  repeated CPUTime cpu_times = 1;
+}
+
+message CPUUtilizations {
+  message CPUUtilization {
+    int64 timestamp = 1;
+    int32 cpu_index = 2;
+    float percent = 3;
+  }
+  repeated CPUUtilization cpu_utilizations = 1;
+}
