@@ -15,7 +15,7 @@ class Server:
         self.config = Config(**config)
 
         self.connections = {}
-        self.address = {}
+        self.addresses = {}
 
         self.init()
 
@@ -25,7 +25,7 @@ class Server:
         self.set_sockopt()
 
         self.epoll = select.epoll()
-        self.epoll.register(self.s.fileno(), select.EPOLIN | select.EPOLLET)
+        self.epoll.register(self.s.fileno(), select.EPOLLIN | select.EPOLLET)
 
     def bind(self):
         self.s.bind((self.config.bind, self.config.port))
@@ -35,10 +35,11 @@ class Server:
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     def run(self):
+        print("server start at {} bind to {}...".format(self.config.port, self.config.bind))
         while True:
             eplist = self.epoll.poll()
             for fd, event in eplist:
-                if fd == self.fileno():
+                if fd == self.s.fileno():
                     self.new_connection_come()
                 else:
                     self.deal_with_data(fd, event)
@@ -68,7 +69,7 @@ class Server:
 
     def new_connection_come(self):
         conn, addr = self.s.accept()
-        print("新连接到来...")
+        print("new connection from addr ip: {}, port: {}".format(addr[0], addr[1]))
         self.connections[conn.fileno()] = conn
         self.addresses[conn.fileno()] = addr
         self.epoll.register(conn.fileno(), select.EPOLLIN | select.EPOLLET)
