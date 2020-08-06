@@ -3,7 +3,9 @@
 import time
 import psutil
 
+from date_utils import DateUtils
 import proto.cpu_monitor_pb2 as cpu_monitor_pb
+
 
 class CPUMonitor:
     def __init__(self):
@@ -17,6 +19,7 @@ class CPUMonitor:
         self.init()
         self.cpu_times()
         self.cpu_utilizations()
+        self.print()
         self.save()
 
     def cpu_times(self):
@@ -38,9 +41,17 @@ class CPUMonitor:
             cpu_utilization_proto.percent = cpu_utilization
 
     def save(self):
-        print("保存数据到数据库")
-        print(self.cpu_times_proto)
-        print(self.cpu_utilizations_proto)
+        pass
+
+    def print(self):
+        dateutil_obj = DateUtils()
+        for cpu_time in self.cpu_times_proto.cpu_times:
+            print("CPU Index: {}".format(cpu_time.cpu_index))
+            print("统计时间: {}".format(dateutil_obj.timestamp_to_string(cpu_time.timestamp)))
+            print("用户进程耗时: {}(秒)".format(cpu_time.user_mode_time))
+            print("内核进程耗时: {}(秒)".format(cpu_time.kernel_mode_time))
+            print("CPU空闲时间: {}(秒)".format(cpu_time.idle_time))
+
 
 if __name__ == '__main__':
     obj = CPUMonitor()
